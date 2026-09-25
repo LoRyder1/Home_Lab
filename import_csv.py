@@ -15,26 +15,35 @@
 # Export variable in your shell - API Key
 # export ES_API_KEY="YOUR_ENCODED_API_KEY_HERE"
 
-
-
-
 import csv
 import json
+import os
 import requests
 import urllib3
+from dotenv import load_dotenv
 
+
+# Disable SSL warnings for self-signed certs
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Config settings
-CSV_FILE_PATH = "/mnt/storage_fast/G_Labs_anti_forensics/I30-windows-update.csv"
-ES_URL = "https://127.0.0.1:9200/so-i30-windows-update/_bulk"
+# Load env variables from .env file
+load_dotenv()
+
+# Best for local development, not production
+API_KEY = os.getenv("ES_API_KEY")
+CSV_FILE_PATH = os.getenv("CSV_FILE_PATH")
+ES_URL = os.getenv("ES_URL")
 
 
+# Validate required variables are loaded
+missing_vars = [var_name for var_name, var_val in [
+    ("ES_API_KEY", API_KEY),
+    ("CSV_FILE_PATH", CSV_FILE_PATH),
+    ("ES_URL", ES_URL)
+] if not var_val]
 
-# Fetch from OS environment
-# not best eventually want to use a better maintable way to handle API Keys
-API_KEY = os.environ.get("ES_API_KEY")
-
+if missing_vars:
+    raise ValueError(f"Missing required environment variable(s) in .env: {', '.join(missing_vars)}")
 
 
 headers = {
