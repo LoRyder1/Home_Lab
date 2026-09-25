@@ -1,5 +1,3 @@
-
-
 # Purpose of this script is to parse csv that is stored locally and import into SIEM
 # use SIEM to analyze data! Better than using Timeline Explorer in Windows
 # Used API Key
@@ -23,13 +21,11 @@ import requests
 import urllib3
 from dotenv import load_dotenv
 
-
 # Disable SSL warnings for self-signed certs
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load env variables from .env file
 load_dotenv()
-
 
 # Set up CLI argument parser
 parser = argparse.ArgumentParser(description="Ingest CSV into Elasticsearch.")
