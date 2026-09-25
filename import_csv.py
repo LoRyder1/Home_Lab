@@ -17,6 +17,7 @@
 
 import csv
 import json
+import argparse
 import os
 import requests
 import urllib3
@@ -29,9 +30,21 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Load env variables from .env file
 load_dotenv()
 
+
+# Set up CLI argument parser
+parser = argparse.ArgumentParser(description="Ingest CSV into Elasticsearch.")
+parser.add_argument(
+    "-f", "--file",
+    type=str,
+)
+
+args = parser.parse_args()
+
+CSV_FILE_PATH = args.file
+
+
 # Best for local development, not production
 API_KEY = os.getenv("ES_API_KEY")
-CSV_FILE_PATH = os.getenv("CSV_FILE_PATH")
 ES_URL = os.getenv("ES_URL")
 
 

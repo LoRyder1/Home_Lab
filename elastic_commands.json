@@ -1,0 +1,32 @@
+
+// Prevent future indices from creting replicas
+
+sudo so-elasticsearch-query _template/zero_replicas -X PUT -H 'Content-Type: application/json' -d '{
+  "index_patterns": ["*"],
+  "settings": {
+    "number_of_replicas": 0
+  }
+}'
+
+sudo so-elasticsearch-query _template/zero_replicas -X PUT -d '{
+  "index_patterns": ["*"],
+  "settings": {
+    "number_of_replicas": 0
+  }
+}'
+
+
+// set replica count on this data stream index to 0
+
+sudo so-elasticsearch-query .ds-kibana_sample_data_logs-2026.09.20-000001/_settings -X PUT -H 'Content-Type: application/json' -d '{
+  "index": {
+    "number_of_replicas": 0
+  }
+}'
+
+
+sudo so-elasticsearch-query .ds-kibana_sample_data_logs-2026.09.20-000001/_settings -X PUT -d '{
+  "index": {
+    "number_of_replicas": 0
+  }
+}'
