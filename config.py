@@ -1,23 +1,23 @@
 # config.py
+from pathlib import Path
 import argparse
-import csv
-import json
 import os
-import requests
 import urllib3
 from dotenv import load_dotenv
 
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
+ENV_PATH = Path(__file__).resolve().parent / ".env"
 # Load environment configuration
-load_dotenv()
+load_dotenv(dotenv_path=ENV_PATH)
 
 def get_env_config():
     """Retrieve validated environment settings."""
     config = {
         "API_KEY": os.getenv("ES_API_KEY"),
-        "ES_URL": os.getenv("ES_URL"),
+        "ES_URL": os.getenv("ES_URL")
     }
     
     missing = [k for k, v in config.items() if not v]

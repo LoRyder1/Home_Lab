@@ -2,36 +2,52 @@
 import csv
 import json
 import requests
-from config import get_env_config, parse_args
+import urllib3
+from dotenv import load_dotenv
 
-# Load config and CLI arguments
-config = get_env_config()
-args = parse_args()
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# CSV path originates exclusively from CLI arguments
-CSV_FILE_PATH = args.file
+load_dotenv()
+
+CSV_FILE_PATH = os.getenv("CSV_FILE_PATH")
+ES_URL = os.getenv("ES_URL")
+API_KEY = os.getenv("ES_API_KEY")
 
 headers = {
     "Content-Type": "application/x-ndjson",
-    "Authorization": f"ApiKey {config['API_KEY']}"
+    "Authorization": f"ApiKey {API_KEY}"
 }
 
-bulk_data = ""
+BATCH_SIZE = 1000  # Number of CSV rows per bulk request
+current_batch = []
+total_ingested = 0
+
+def send_batch(batch_rows):
+    bulk_payload = ""
+    for row in batch_rows:
+        bulk_payload += json.dumps({"index": {}}) + "\n"
+        bulk_payload += json.dumps(row) + "\n"
+        
+    response = requests.post(
+        ES_URL,
+        headers=headers,
+        data=bulk_payload,
+        verify=False
+    )
+    return response.status_code
+
 with open(CSV_FILE_PATH, mode="r", encoding="utf-8") as file:
     reader = csv.DictReader(file)
     for row in reader:
-        # Action metadata header
-        bulk_data += json.dumps({"index": {}}) + "\n"
-        # Document payload
-        bulk_data += json.dumps(row) + "\n"
+        current_batch.append(row)
+        if len(current_batch) >= BATCH_SIZE:
+            status = send_batch(current_batch)
+            total_ingested += len(current_batch)
+            print(f"Ingested {total_ingested} rows... Status: {status}")
+            current_batch = []
 
-# Send bulk request to Elasticsearch
-response = requests.post(
-    config["ES_URL"],
-    headers=headers,
-    data=bulk_data,
-    verify=False
-)
-
-print(f"Status Code: {response.status_code}")
-print(response.text[:200])
+# Send remaining rows
+if current_batch:
+    status = send_batch(current_batch)
+    total_ingested += len(current_batch)
+    print(f"Final batch sent. Total ingested: {total_ingested} rows. Status: {status}")
