@@ -3,6 +3,7 @@ import csv
 import json
 import requests
 import urllib3
+import os
 from dotenv import load_dotenv
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
