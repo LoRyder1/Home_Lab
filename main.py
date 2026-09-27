@@ -1,22 +1,16 @@
-from depts import argparse, csv, json, os, requests, urllib3, load_dotenv
+from deps import argparse, csv, json, os, requests, urllib3, load_dotenv
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 load_dotenv()
 
 API_KEY = os.getenv("ES_API_KEY")
-BATCH_SIZE = 1000  # Number of CSV rows per bulk request
 
-def parse_args()
-    parser = argparse.ArguemntParser(description="Ingest CSV data into Elasticsearch.")
-    parser.add_argument(
-        "-f", "--file-path",
-        default=os.getenv("CSV_FILE_PATH")
-    )
-    parser.add_argument(
-        "-u", "--index",
-        default=os.getenv("ES_INDEX", "default-index")
-    )
-    return parser.parse.args()
+def parse_args():
+    parser = argparse.ArgumentParser(description="Ingest CSV data into Elasticsearch.")
+    parser.add_argument("-f", "--file-path", required=True)
+    parser.add_argument("-u", "--index", required=True)
+    parser.add_argument("-b", "--batch-size", type=int, default=1000)
+    return parser.parse_args()
 
 def send_batch(batch_rows, es_url, headers):
     bulk_payload = ""
@@ -24,18 +18,12 @@ def send_batch(batch_rows, es_url, headers):
         bulk_payload += json.dumps({"index": {}}) + "\n"
         bulk_payload += json.dumps(row) + "\n"
         
-    response = requests.post(
-        ES_URL,
-        headers=headers,
-        data=bulk_payload,
-        verify=False
-    )
+    response = requests.post(es_url, headers=headers, data=bulk_payload, verify=False)
     return response.status_code
 
-def main()
+def main():
     args = parse_args()
 
-    # Dynamic ES URL construction using argument x (args.index)
     es_url = f"https://127.0.0.1:9200/{args.index}/_bulk"
 
     headers = {
