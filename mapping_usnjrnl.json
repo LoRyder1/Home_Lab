@@ -1,0 +1,34 @@
+PUT /_index_template/so-usnjrnl-template
+{
+  "index_patterns": ["so-usnjrnl*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "UpdateTimestamp": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss.SSSSSSS||yyyy-MM-dd HH:mm:ss||strict_date_optional_time||epoch_millis"
+        },
+        "Name": { "type": "keyword" },
+        "Extension": { "type": "keyword" },
+        "EntryNumber": { "type": "long" },
+        "SequenceNumber": { "type": "long" },
+        "ParentEntryNumber": { "type": "long" },
+        "ParentSequenceNumber": { "type": "long" },
+        "ParentPath": {
+          "type": "keyword",
+          "fields": { "text": { "type": "text" } }
+        },
+        "UpdateSequenceNumber": { "type": "long" },
+        "UpdateReasons": { "type": "keyword" },
+        "FileAttributes": { "type": "keyword" },
+        "OffsetToData": { "type": "long" },
+        "SourceFile": { "type": "keyword" }
+      }
+    }
+  }
+}
